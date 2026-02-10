@@ -15,7 +15,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center gap-3 bg-zinc-50 font-sans dark:bg-black">
-      <WalletCard balance={balance} loading={false} />
+      <WalletCard balance={balance} loading={false} initialData={initial} />
       <PnlCard initialData={initial} />
     </div>
   );
