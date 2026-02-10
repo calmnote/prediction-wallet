@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import { pressable } from "@/shared/lib/motion";
 
 type MotionButtonProps = React.ComponentPropsWithoutRef<typeof motion.button>;
 
@@ -28,10 +29,7 @@ export const Button = ({
 
   return (
     <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      whileDrag={{ scale: 0.98 }}
-      drag={false}
+      {...pressable}
       className={`${base} ${styles} ${className}`}
       {...props}
     >

@@ -23,3 +23,11 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+.pnl-chart *:focus {
+  outline: none !important;
+}
+.pnl-chart .recharts-wrapper:focus,
+.pnl-chart svg:focus {
+  outline: none !important;
+}
