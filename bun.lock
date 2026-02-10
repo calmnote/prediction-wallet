@@ -5,6 +5,7 @@
     "": {
       "name": "prediction-wallet",
       "dependencies": {
+        "clsx": "^2.1.1",
         "framer-motion": "^12.34.0",
         "next": "16.1.6",
         "number-flow": "^0.5.9",
