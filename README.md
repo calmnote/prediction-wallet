@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prediction (wallet card) — Test task
+
+
+Implemented:
+- Wallet card (USDC balance)
+- PnL card with range tabs, interactive chart hover, and metrics
+- Deposit / Withdraw flows
+- **All external requests are executed via Server Actions**
+- Server-side caching (**60s**) per `publicKey + range`
+
+---
+
+## Features
+
+### Wallet
+- Fetches ERC-20 balance (USDC) via Etherscan API
+- Displays:
+    - Balance (USDC)
+
+### PnL
+- Fetches wallet transfer history and builds PnL series
+- Range tabs: `1h / 6h / 1d / 1w / 1m / all`
+- Chart hover shows point date/time and value
+- Values are animated with NumberFlow
+
+### Deposit
+- Shows deposit target address
+- Can check deposits by parsing ERC-20 transfers
+
+### Withdraw
+- Sends ERC-20 transfer from the configured wallet (private key stored in `.env`)
+- Polls tx status until success/error
+- Updates local balance after confirmation
+
+---
+
+## Tech Stack
+
+- next.js 
+- typeScript
+- bun
+- @tailwindcss
+- framer-motion
+- recharts
+- @number-flow/react
+- etherscan API 
+- public RPC endpoint
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1) Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
+```
+### 2) Environment variables
+Create .env from .env.example:
+
+```bash
+cp .env.example .env
+```
+
+### 3) Run development server
+
+```bash
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment (.env.example)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Etherscan, RPC
+ETHERSCAN_API_URL=https://api.etherscan.io/v2/api
+ETH_RPC_URL=https://ethereum-rpc.publicnode.com
+ETHERSCAN_API_KEY=
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Wallet, chain (mainnet/sepolia)
+CHAIN_ID=1
+WALLET_PRIVATE_KEY=
+PUBLIC_KEY=
 
-## Learn More
+# Token config (for example: USDC)
+TOKEN_ADDRESS=
+TOKEN_DECIMALS=6
 
-To learn more about Next.js, take a look at the following resources:
+# Deposit 
+DEPOSIT_TARGET=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Architecture (FSD)
+```	
+src/actions/
+	Server Actions only
+	All external requests: tx status, tx list, deposit, withdraw
+src/widgets/
+	Feature-level UI blocks (WalletCard, PnlCard)
+src/features/
+	User flows (Deposit/Withdraw modals)
+src/entities/
+	State management (wallet store)
+src/shared/
+	Reusable UI, libs, config, types, formattin
+```
