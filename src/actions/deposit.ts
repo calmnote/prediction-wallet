@@ -1,9 +1,9 @@
 "use server";
 
 import { env } from "@/shared/config/env";
-import { erc20Abi } from "@/shared/lib/erc20";
-import { toUnits } from "@/shared/lib/amount";
-import { walletClient } from "@/shared/lib/veim";
+import { erc20Abi } from "@/shared/lib/evm/erc20";
+import { toUnits } from "@/shared/lib/evm/amount";
+import { walletClient } from "@/shared/lib/evm/veim";
 
 export async function deposit(amount: string) {
   const value = toUnits(amount, env.TOKEN_DECIMALS);
