@@ -2,8 +2,8 @@ import "server-only";
 
 import { env } from "@/shared/config/env";
 
-async function etherscanFetch(params: Record<string, string>) {
-  const url = new URL(env.ETH_RPC_URL);
+export async function etherscanFetch(params: Record<string, string>) {
+  const url = new URL(env.ETH_API_URL);
   Object.entries({ ...params, apikey: env.ETHERSCAN_API_KEY }).forEach(
     ([k, v]) => url.searchParams.set(k, v),
   );
@@ -23,7 +23,7 @@ async function etherscanFetch(params: Record<string, string>) {
   return data;
 }
 
-export async function getErc20Balance(params: {
+export async function getTokenBalance(params: {
   address: string;
   tokenAddress: string;
 }) {
