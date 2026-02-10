@@ -1,7 +1,7 @@
 "use server";
 
 import { env } from "@/shared/config/env";
-import { getErc20Balance } from "@/shared/lib/etherscan";
+import { getTokenBalance } from "@/shared/lib/etherscan/etherscan";
 
 interface WalletSummary {
   address: string;
@@ -15,7 +15,7 @@ export async function getWalletSummary(
 ): Promise<WalletSummary> {
   const address = (publicKey ?? env.PUBLIC_KEY).toLowerCase();
 
-  const raw = await getErc20Balance({
+  const raw = await getTokenBalance({
     address,
     tokenAddress: env.TOKEN_ADDRESS,
   });
