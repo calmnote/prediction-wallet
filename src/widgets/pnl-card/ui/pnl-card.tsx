@@ -1,29 +1,20 @@
 "use client";
 
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/shared/ui/card";
 
 import { PnlHeader } from "./pnl-header";
 import { PnlMetrics } from "./pnl-metrics";
 import { PnlChart } from "./pnl-chart";
 import type { PnlRange } from "./pnl-tabs";
-import { useState } from "react";
-import type { Point } from "./pnl-chart";
-import { generateSeries } from "@/shared/lib/generateSeries";
 import { LogoIcon } from "@/shared/ui/icons";
-
-const mockByRange: Record<PnlRange, any[]> = {
-  "1h": generateSeries("1h", 11),
-  "6h": generateSeries("6h", 22),
-  "1d": generateSeries("1d", 33),
-  "1w": generateSeries("1w", 44),
-  "1m": generateSeries("1m", 55),
-  all: generateSeries("all", 66),
-};
+import { getPnlSeries } from "@/actions/get-pnl-series";
+import { Point } from "@/shared/lib/pnl/types";
 
 const rangeLabel: Record<PnlRange, string> = {
-  "1h": "Past Day",
-  "6h": "Past Day",
+  "1h": "Past hour",
+  "6h": "Past 6 hours",
   "1d": "Past Day",
   "1w": "Past Week",
   "1m": "Past Month",
@@ -33,9 +24,30 @@ const rangeLabel: Record<PnlRange, string> = {
 export const PnlCard = () => {
   const [range, setRange] = useState<PnlRange>("6h");
   const [hoverPoint, setHoverPoint] = useState<Point | null>(null);
+  const [data, setData] = useState<Point[]>([]);
 
-  const data = mockByRange[range];
-  const last = data.at(-1);
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      setHoverPoint(null);
+
+      try {
+        const res = await getPnlSeries(range);
+        if (!cancelled) setData(res);
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) setData([]);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [range]);
+
+  const last = data.length ? data[data.length - 1] : null;
+  const currentV = hoverPoint?.v ?? last?.v ?? 0;
 
   const label = hoverPoint
     ? new Date(hoverPoint.ts).toLocaleString("en-US", {
@@ -54,18 +66,15 @@ export const PnlCard = () => {
         <PnlHeader
           range={range}
           onRangeChange={setRange}
-          isPositive={(hoverPoint?.v ?? last.v) < 0}
+          isPositive={currentV >= 0}
         />
 
         <div className="flex items-center justify-between">
-          <PnlMetrics
-            value={`${(hoverPoint?.v ?? last.v).toFixed(2)}`}
-            label={label}
-          />
+          <PnlMetrics value={currentV.toFixed(2)} label={label} />
           <LogoIcon />
         </div>
 
-        <PnlChart data={data} onHover={(p) => setHoverPoint(p)} />
+        <PnlChart data={data} onHover={setHoverPoint} />
       </div>
     </Card>
   );

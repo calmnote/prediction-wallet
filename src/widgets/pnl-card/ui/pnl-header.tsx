@@ -23,7 +23,7 @@ export const PnlHeader = ({
       <div className="flex items-center gap-2">
         <ArrowIcon
           className={clsx(
-            isPositive ? "text-red-500 rotate-180" : "text-positive",
+            isPositive ? "text-positive" : "text-red-500 rotate-180",
             "h-4 w-4 transition-all",
           )}
         />

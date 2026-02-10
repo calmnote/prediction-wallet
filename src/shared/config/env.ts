@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 
 const envSchema = z.object({
+  ETH_API_URL: z.string().url(),
   ETH_RPC_URL: z.string().url(),
   ETHERSCAN_API_KEY: z.string().min(1),
 
@@ -20,6 +21,7 @@ const envSchema = z.object({
   TOKEN_ADDRESS: z
     .string()
     .min(1)
+    .transform((v) => (v.startsWith("0x") ? v : `0x${v}`) as `0x${string}`)
     .refine(
       (v) => /^0x[0-9a-fA-F]{40}$/.test(v),
       "Invalid TOKEN_ADDRESS value",

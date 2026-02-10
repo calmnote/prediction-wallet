@@ -20,7 +20,7 @@ export const PnlMetrics = ({ value, label }: PnlMetricsProps) => {
     const num = Number(numeric);
 
     return {
-      sign: isNeg ? "−" : "+",
+      sign: Number(s) === 0 ? "" : isNeg ? "−" : "+",
       amount: Number.isFinite(num) ? Math.abs(num) : 0,
     };
   }, [value]);

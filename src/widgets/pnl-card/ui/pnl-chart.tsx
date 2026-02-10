@@ -1,15 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, ResponsiveContainer, XAxis } from "recharts";
-
-export type Point = { ts: string; v: number };
+import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
+import { AreaMouseState, Point } from "@/shared/lib/pnl/types";
 
 type PnlChartProps = {
   data: Point[];
   onHover?: (p: Point | null, index?: number) => void;
   yDomain?: [number, number];
 };
+
 export const PnlChart = ({ data, onHover }: PnlChartProps) => {
   return (
     <div className="pnl-chart h-[87.5px] w-full">
@@ -17,11 +17,13 @@ export const PnlChart = ({ data, onHover }: PnlChartProps) => {
         <AreaChart
           data={data}
           margin={{ top: 6, right: 6, left: 0, bottom: 0 }}
-          onMouseMove={(state: any) => {
+          onMouseMove={(state: AreaMouseState) => {
             const idxRaw = state?.activeTooltipIndex ?? state?.activeIndex;
-            if (idxRaw === undefined || idxRaw === null) return;
+            if (idxRaw == null) return;
 
-            const idx = typeof idxRaw === "string" ? Number(idxRaw) : idxRaw;
+            const idx =
+              typeof idxRaw === "number" ? idxRaw : Number(String(idxRaw));
+
             if (!Number.isFinite(idx)) return;
 
             const point = data[idx];
@@ -37,7 +39,11 @@ export const PnlChart = ({ data, onHover }: PnlChartProps) => {
           </defs>
 
           <XAxis dataKey="ts" hide />
-
+          <YAxis
+            hide
+            domain={["auto", "auto"]}
+            padding={{ top: 16, bottom: 6 }}
+          />
           <Area
             type="monotone"
             dataKey="v"
