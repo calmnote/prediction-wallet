@@ -2,8 +2,10 @@ import { getWalletSummary } from "@/actions/get-wallet-summary";
 import { WalletCard } from "@/widgets/wallet-card/ui/wallet-card";
 import { formatUnits } from "viem";
 import { PnlCard } from "@/widgets/pnl-card/ui/pnl-card";
+import { getPnlSeries } from "@/actions/get-pnl-series";
 
 export default async function Home() {
+  const initial = await getPnlSeries("1w");
   const data = await getWalletSummary();
   const raw = BigInt(data.rawBalance);
   const humanStr = formatUnits(raw, data.decimals);
@@ -14,7 +16,7 @@ export default async function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center gap-3 bg-zinc-50 font-sans dark:bg-black">
       <WalletCard balance={balance} loading={false} />
-      <PnlCard />
+      <PnlCard initialData={initial} />
     </div>
   );
 }

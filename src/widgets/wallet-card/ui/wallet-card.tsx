@@ -11,18 +11,27 @@ import { DepositModal } from "@/features/deposit/ui/deposit-modal";
 import { WithdrawModal } from "@/features/withdraw/ui/withdraw-modal";
 import { useWalletStore } from "@/entities/wallet/model/wallet.store";
 import NumberFlow, { NumberFlowGroup } from "@number-flow/react";
+import { calcDailyPnl } from "@/shared/lib/pnl/calcDailyPnl";
+import { Point } from "@/shared/lib/pnl/types";
 
 type WalletCardProps = {
   loading: boolean;
   balance: bigint | string;
+  initialData: Point[];
 };
 
-export const WalletCard = ({ loading, balance }: WalletCardProps) => {
+export const WalletCard = ({
+  loading,
+  balance,
+  initialData,
+}: WalletCardProps) => {
   const setBalance = useWalletStore((s) => s.setBalance);
   const userBalance = useWalletStore((s) => s.balance);
 
   const [depositOpen, setDepositOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
+
+  const pnl = calcDailyPnl(initialData);
 
   useEffect(() => {
     setBalance(Number(balance));
@@ -51,7 +60,12 @@ export const WalletCard = ({ loading, balance }: WalletCardProps) => {
           <span className="text-[40px] tracking-[-0.8px]">USDC</span>
         </Heading>
 
-        <PnlRow value={23.43} percent={5.2} periodLabel="Today" trend="up" />
+        <PnlRow
+          value={pnl.delta}
+          percent={pnl.percent}
+          periodLabel="Today"
+          trend={pnl.trend}
+        />
       </CardContent>
       <DepositModal open={depositOpen} onClose={() => setDepositOpen(false)} />
       <WithdrawModal

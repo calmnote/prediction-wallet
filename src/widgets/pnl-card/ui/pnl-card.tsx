@@ -21,10 +21,12 @@ const rangeLabel: Record<PnlRange, string> = {
   all: "All time",
 };
 
-export const PnlCard = () => {
+type Props = { initialData: Point[] };
+
+export function PnlCard({ initialData }: Props) {
   const [range, setRange] = useState<PnlRange>("6h");
   const [hoverPoint, setHoverPoint] = useState<Point | null>(null);
-  const [data, setData] = useState<Point[]>([]);
+  const [data, setData] = useState<Point[]>(initialData ?? []);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,4 +80,4 @@ export const PnlCard = () => {
       </div>
     </Card>
   );
-};
+}
