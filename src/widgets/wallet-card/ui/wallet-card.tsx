@@ -8,7 +8,7 @@ import { Heading } from "@/shared/ui/typography/heading";
 import { Card, CardContent, CardHeader } from "@/shared/ui/card";
 import { useEffect, useState } from "react";
 import { DepositModal } from "@/features/deposit/ui/deposit-modal";
-import { WithdrawModal } from "@/features/deposit/withdraw/ui/withdraw-modal";
+import { WithdrawModal } from "@/features/withdraw/ui/withdraw-modal";
 import { useWalletStore } from "@/entities/wallet/model/wallet.store";
 import NumberFlow, { NumberFlowGroup } from "@number-flow/react";
 
