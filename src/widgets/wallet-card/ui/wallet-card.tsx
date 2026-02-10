@@ -35,7 +35,7 @@ export const WalletCard = ({ loading, balance }: WalletCardProps) => {
         <WalletStats portfolioNotUsdc="$3,361.42" usdcPlusPortfolio="$0,01" />
       </CardHeader>
       <CardContent>
-        <Heading as="h1" className="flex items-baseline gap-2">
+        <Heading as="h1" className="flex items-baseline gap-2 h-12.75">
           {loading ? (
             "—"
           ) : (
