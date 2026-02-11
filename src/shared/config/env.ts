@@ -38,6 +38,14 @@ const envSchema = z.object({
     ),
 
   CHAIN_ID: z.coerce.string().default("1"),
+  PNL_NEGATIVE_TO_ADDRESS: z
+    .string()
+    .min(1)
+    .transform((v) => (v.startsWith("0x") ? v : `0x${v}`) as `0x${string}`)
+    .refine(
+      (v) => /^0x[0-9a-fA-F]{40}$/.test(v),
+      "Invalid PNL_NEGATIVE_TO_ADDRESS value",
+    ),
 });
 
 export type Env = z.infer<typeof envSchema>;

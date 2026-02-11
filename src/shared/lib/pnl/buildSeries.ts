@@ -1,6 +1,14 @@
 import { PnlRange, Point } from "@/shared/lib/pnl/types";
+import { env } from "@/shared/config/env";
 
-type Flow = { ts: number; dir: "in" | "out"; amount: number };
+export type Flow = {
+  ts: number;
+  amount: number;
+  dir: "in" | "out";
+  to?: string;
+  from?: string;
+  hash?: string;
+};
 
 const rangeToMs = (r: PnlRange) =>
   ({
@@ -22,24 +30,38 @@ const bucketMs = (r: PnlRange) =>
     all: 86400000,
   })[r];
 
+const eqAddr = (a?: string, b?: string) =>
+  (a ?? "").toLowerCase() === (b ?? "").toLowerCase();
+
 export function buildPnlSeries(flows: Flow[], range: PnlRange): Point[] {
   const now = Date.now();
   const from = now - rangeToMs(range);
   const step = bucketMs(range);
 
   const map = new Map<number, number>();
+
   for (const f of flows) {
     if (f.ts < from || f.ts > now) continue;
+
     const bucket = Math.floor((f.ts - from) / step) * step + from;
-    const signed = f.dir === "in" ? f.amount : -f.amount;
+
+    const forceNegative = eqAddr(f.to, env.PNL_NEGATIVE_TO_ADDRESS);
+    const signed = forceNegative
+      ? -f.amount
+      : f.dir === "in"
+        ? f.amount
+        : -f.amount;
+
     map.set(bucket, (map.get(bucket) ?? 0) + signed);
   }
 
   const points: Point[] = [];
   let acc = 0;
+
   for (let t = from; t <= now; t += step) {
     acc += map.get(t) ?? 0;
     points.push({ ts: t, v: acc });
   }
+
   return points;
 }

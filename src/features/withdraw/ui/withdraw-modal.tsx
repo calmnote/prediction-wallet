@@ -74,7 +74,8 @@ export const WithdrawModal = ({
     if (!isAddress(to)) return setError("Invalid recipient address");
     if (!amount || !Number.isFinite(amountNum) || amountNum <= 0)
       return setError("Amount must be greater than 0");
-    if (amountNum > userBalance) return setError("Amount exceeds your balance");
+    if (amountNum >= userBalance)
+      return setError("Amount exceeds your balance");
 
     setStatus("signing");
 
