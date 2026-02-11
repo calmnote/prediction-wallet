@@ -5,7 +5,7 @@ import { Text } from "@/shared/ui/typography/text";
 
 type WalletStatsProps = {
   portfolioNotUsdc: string;
-  usdcPlusPortfolio: string;
+  usdcPlusPortfolio: number;
 };
 
 export const WalletStats = ({
@@ -35,8 +35,7 @@ export const WalletStats = ({
           tone={"primary"}
           className="flex items-center gap-1.5 mt-0.5"
         >
-          <MoneyIcon />
-          {usdcPlusPortfolio}
+          <MoneyIcon />${usdcPlusPortfolio.toFixed(2)}
         </Text>
       </div>
     </div>

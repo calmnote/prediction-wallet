@@ -7,7 +7,8 @@ import { formatUnits } from "viem";
 
 import { Button } from "@/shared/ui/button";
 import { Text } from "@/shared/ui/typography/text";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useWalletStore } from "@/entities/wallet/model/wallet.store";
 
 type DepositTx = {
   hash: `0x${string}`;
@@ -31,17 +32,70 @@ export const DepositModal = ({
   const [address, setAddress] = useState<string>("");
   const [decimals, setDecimals] = useState<number>(6);
   const [txs, setTxs] = useState<DepositTx[]>([]);
+  const applyDeposit = useWalletStore((s) => s.applyDeposit);
+  const seenRef = useRef<Set<string>>(new Set());
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
 
-    (async () => {
+    initializedRef.current = false;
+    seenRef.current = new Set();
+
+    let alive = true;
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const loadOnce = async () => {
       const info = await getDepositInfo();
+      if (!alive) return;
       setAddress(info.address);
       setDecimals(info.decimals);
-      const list = await checkDeposits();
-      setTxs(list);
+    };
+
+    const loadTxs = async () => {
+      try {
+        const list = await checkDeposits();
+        if (!alive) return;
+
+        if (!initializedRef.current) {
+          initializedRef.current = true;
+          seenRef.current = new Set(list.map((t) => t.hash.toLowerCase()));
+          setTxs(list);
+          return;
+        }
+
+        const prevSeen = seenRef.current;
+
+        const newOnes = list.filter((t) => !prevSeen.has(t.hash.toLowerCase()));
+
+        if (newOnes.length) {
+          const delta = newOnes.reduce((sum, t) => {
+            const amount = Number(formatUnits(BigInt(t.rawValue), decimals));
+            return sum + amount;
+          }, 0);
+
+          if (delta > 0) applyDeposit(delta);
+
+          for (const t of newOnes) prevSeen.add(t.hash.toLowerCase());
+        }
+
+        setTxs(list);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    (async () => {
+      await loadOnce();
+      await loadTxs();
+
+      timer = setInterval(loadTxs, 6000);
     })();
+
+    return () => {
+      alive = false;
+      if (timer) clearInterval(timer);
+    };
   }, [open]);
 
   const copy = async () => {

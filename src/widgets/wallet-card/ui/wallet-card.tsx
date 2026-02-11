@@ -41,7 +41,10 @@ export const WalletCard = ({
     <Card className="flex flex-col gap-4.5 w-full max-w-159.75 p-5">
       <CardHeader>
         <WalletHeader />
-        <WalletStats portfolioNotUsdc="$3,361.42" usdcPlusPortfolio="$0,01" />
+        <WalletStats
+          portfolioNotUsdc="$3,361.42"
+          usdcPlusPortfolio={userBalance}
+        />
       </CardHeader>
       <CardContent>
         <Heading as="h1" className="flex items-baseline gap-2 h-12.75">
